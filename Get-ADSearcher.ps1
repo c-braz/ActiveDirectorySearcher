@@ -163,20 +163,56 @@ function Get-ADXObject{
     [switch]$Computer,
     [switch]$GPO,
     [switch]$OU,
-    [string]$matches = '*'
+    [switch]$Container,
+    [switch]$SecGroup,
+    [switch]$DistroGroup,
+    [string]$match
     )
 
     if($user){
-            if($filter){
-		$filter = "(&($filter)(SamAccountType=805306368))"}
+        if($filter){
+		    $filter = "(&($filter)(SamAccountType=805306368))"}
             else{$filter = "(SamAccountType=805306368)"}
+       }
+     if($SecGroup){
+        if($filter){
+		    $filter = "(&($filter)(GroupType:1.2.840.113556.1.4.803:=268435456))"}
+            else{$filter = "(GroupType:1.2.840.113556.1.4.803:=2147483648)"}
+       }
+     if($DistroGroup){
+        if($filter){
+		    $filter = "(&($filter)(&(objectclass=group)(!GroupType:1.2.840.113556.1.4.804:=2147483648)))"}
+            else{$filter = "(&(objectclass=group)(!GroupType:1.2.840.113556.1.4.804:=2147483648))"}
+       }
+    if($Computer){
+    if($filter){
+		$filter = "(&($filter)(SamAccountType=805306369))"}
+         else{$filter = "(SamAccountType=805306369)"}
 		
        }
-	if($matches){
+    if($OU){
+            if($filter){
+		$filter = "(&($filter)(objectclass=organizationalunit))"}
+            else{$filter = "(objectclass=organizationalunit)"}
+		
+       }
+    if($container){
+            if($filter){
+		$filter = "(&($filter)(!(|(objectcategory=user)(objectclass=grouppolicycontainer))))"}
+            else{$filter = "(!(|(objectcategory=user)(objectclass=grouppolicycontainer)))"}
+		
+       }
+    if($GPO){
+            if($filter){
+		$filter = "(&($filter)(objectclass=grouppolicycontainer))"}
+            else{$filter = "(objectclass=grouppolicycontainer)"}
+		
+       }
+    if($match){
 	    if($filter){
-	    $filter = "(&($filter)(|(cn=$matches)(name=$matches)(samaccountname=$matches)(displayname=$matches)(sn=$matches)))"
+	    $filter = "(&($filter)(|(cn=$match)(name=$match)(samaccountname=$match)(displayname=$match)(sn=$match)))"
 	     }
-	    else{$filter = "(|(cn=$matches)(name=$matches)(samaccountname=$matches)(displayname=$matches)(sn=$matches))"}
+	    else{$filter = "(|(cn=$match)(name=$match)(samaccountname=$match)(displayname=$match)(sn=$match))"}
 	}
 	
     if(!$Force){
@@ -190,7 +226,8 @@ function Get-ADXObject{
     $search = new-object -type system.directoryservices.directorysearcher
     $search.filter = $filter
     if($DCAddress){$base = "$DCAddress/$base"}
-    if($base){$ADPath = "LDAP://$base"
+    if($base){
+        $ADPath = "LDAP://$base"
         $entry = new-object -type system.directoryservices.directoryentry -argumentlist $ADPath
         $search.searchroot = $entry
 	}
