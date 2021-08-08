@@ -147,7 +147,7 @@ function Enum-Dacls{
        else{$CustomDacls}
     }
 
-function Get-ADObject{
+function Get-ADXObject{
     param(
     [string]$filter,
     [string]$base,
@@ -171,9 +171,11 @@ function Get-ADObject{
 
     $search = new-object -type system.directoryservices.directorysearcher
     $search.filter = $filter
-    $ADPath = "LDAP://$DCAddress/$base"
-    $entry = new-object -type system.directoryservices.directoryentry -argumentlist $ADPath
-    $search.searchroot = $entry
+    if($DCAddress){$base = "$DCAddress/$base"}
+    if($base){$ADPath = "LDAP://$base"
+        $entry = new-object -type system.directoryservices.directoryentry -argumentlist $ADPath
+        $search.searchroot = $entry
+	}
     foreach($attrib in $attributes){$search.propertiestoload.add($attrib) | out-null}
     $search.sizelimit = $limit
     $search.PageSize = $pagesize
@@ -184,7 +186,5 @@ function Get-ADObject{
     $results = $search.findall()
     $results
     $search.dispose()
-
-    
 
 }
