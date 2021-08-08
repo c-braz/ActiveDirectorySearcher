@@ -169,13 +169,12 @@ function Get-DNSrecords{
     $filter = "(dnsrecord=*)"
     if($name){
     
-    $filter = (&($filter)("$name"))
+    $filter = "(&($filter)(name=$name))"
     }
 
     $search = new-object -type system.directoryservices.directorysearcher
     $search.filter = $filter
-
-    if($DCAddress){$DomainDN = "$DCAddress/$DomainDN"}
+    if($DCAddress){$DomainDN = "$DCAddress/" + "DC=DomainDnsZones," + "$DomainDN"}
     if($DomainDN){
         $ADPath = "LDAP://$DomainDN"
         $entry = new-object -type system.directoryservices.directoryentry -argumentlist $ADPath
@@ -183,13 +182,14 @@ function Get-DNSrecords{
 	}
     else{ 
         $base = $search.searchroot.distinguishedName
-        $DomainDN = "CN=MicrosoftDNS,DC=DomainDnsZones," + "$base"
+        $DomainDN = "DC=DomainDnsZones," + "$base"
         $ADPath = "LDAP://$DomainDN"
+        $adpATH
         $entry = new-object -type system.directoryservices.directoryentry -argumentlist $ADPath
         $search.searchroot = $entry
     
      }
-    
+    $search.searchroot
     $search.propertiestoload.add("dnsrecord") | out-null
     $search.propertiestoload.add("name") | out-null
     $search.SearchScope = 2
@@ -199,4 +199,6 @@ function Get-DNSrecords{
 
 
 }
+
+
 
