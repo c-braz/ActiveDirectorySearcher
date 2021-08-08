@@ -158,9 +158,27 @@ function Get-ADXObject{
     [switch]$ExtendedDN,
     $atrributes = @(),
     [string]$DCAddress,
-    [switch]$Force
+    [switch]$Force,
+    [switch]$User,
+    [switch]$Computer,
+    [switch]$GPO,
+    [switch]$OU,
+    [string]$matches = '*'
     )
 
+    if($user){
+            if($filter){
+		$filter = "(&($filter)(SamAccountType=805306368))"}
+            else{$filter = "(SamAccountType=805306368)"}
+		
+       }
+	if($matches){
+	    if($filter){
+	    $filter = "(&($filter)(|(cn=$matches)(name=$matches)(samaccountname=$matches)(displayname=$matches)(sn=$matches)))"
+	     }
+	    else{$filter = "(|(cn=$matches)(name=$matches)(samaccountname=$matches)(displayname=$matches)(sn=$matches))"}
+	}
+	
     if(!$Force){
         if($pagesize){
                 Write-Output "If the page size is less than limit size. This will cause the limit to never be reached and will return all objects matching the filter! If you know what you are doing use -Force."
