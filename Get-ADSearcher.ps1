@@ -156,7 +156,7 @@ function Get-ADXObject{
     [int]$pagesize,
     [switch]$ntsecurity,
     [switch]$ExtendedDN,
-    $atrributes = @(),
+    $attributes = @(),
     [string]$DCAddress,
     [switch]$Force,
     [switch]$User,
@@ -166,8 +166,13 @@ function Get-ADXObject{
     [switch]$Container,
     [switch]$SecGroup,
     [switch]$DistroGroup,
+    [switch]$DNSRecords,
     [string]$match
     )
+
+    if($DNSRecords){ 
+        
+        }
 
     if($user){
         if($filter){
@@ -243,3 +248,4 @@ function Get-ADXObject{
     $search.dispose()
 
 }
+
